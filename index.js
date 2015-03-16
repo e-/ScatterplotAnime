@@ -20,9 +20,19 @@ var n,
     canvas1Data,
     canvas2Data,
     canvas3Data,
-    isPlaying = false
-    ;
-
+    canvas4Data,
+    isPlaying = false,
+    graphics = new PIXI.Graphics(),
+    stage = new PIXI.Stage(0xFFFFFF),
+    renderer = PIXI.autoDetectRenderer(width, height, {
+      view: $('#canvas4'),
+      antialias: true
+    }),
+    texture,
+    spriteBatch
+  ;
+  
+  
 function getRandomColor(){
   return colors(Math.floor(Math.random() * 10));
 }
@@ -121,7 +131,106 @@ function update(){
   var imageData = context.createImageData(width, height);
   createScene(imageData, canvas3Data);
   context.putImageData(imageData, 0, 0);
+
+  canvas4Data = [];
+  
+  stage.removeChildren();
+
+  spriteBatches = {};
+  
+  colors.range().forEach(function(color) {
+    var sp = new PIXI.SpriteBatch();
+    spriteBatches[color] = sp;
+    stage.addChild(sp);
+  });
+  
+  textures = (function(){
+/*    var g = new PIXI.Graphics();
+    g.beginFill(0x888888);//FFFFFFF);
+    g.drawCircle(r, r, r);
+    g.endFill();
+
+    return g.generateTexture();*/
+
+    var t = {};
+    colors.range().forEach(function(code) {
+      var g = new PIXI.Graphics();
+      g.beginFill(hexToWebgl(code));
+      g.drawCircle(r, r, r);
+      g.endFill();
+      t[code] = g.generateTexture();
+    });
+    return t; 
+  })();
+
+  for(var i = 0 ; i < n ; ++i) {
+    var color = getRandomColor();
+    var sp = new PIXI.Sprite(textures[color]); //textures); //[getRandomColor()]);
+    canvas4Data.push([random(width), random(height), 1, sp]);
+    spriteBatches[color].addChild(sp);
+//    stage.addChild(sp);
+//    sp.tint = hexToWebgl(getRandomColor()); 
+  }
+  
+  updateCanvas4();
 }
+
+function hexToWebgl(hex) {
+  return parseInt(hex.substr(1), 16);
+}
+
+function updateCanvas4()
+{
+  canvas4Data.forEach(function(d){
+    d[3].x = d[0] - r;
+    d[3].y = d[1] - r;
+  });
+
+  renderer.render(stage);
+}
+
+function playCanvas4(){
+  canvas4Data.forEach(function(d){
+    var destX = random(width),
+        destY = random(height);
+
+    d[4] = destX;
+    d[5] = destY;
+    d[6] = d[0];
+    d[7] = d[1];
+  });
+
+  var count = 0, start = null;
+
+  function step(timestamp) {
+    if(!start) start = timestamp;
+    var progress = (timestamp - start) / duration;
+    if(progress > 1) {
+      canvas4Data.forEach(function(d){
+        d[0] = d[4];
+        d[1] = d[5];
+      });
+      
+      updateCanvas4();
+      isPlaying = false;
+      return;
+    }
+
+    var c = cubic(progress);
+    
+    canvas4Data.forEach(function(d){
+      d[0] = (d[4] - d[6]) * c + d[6];
+      d[1] = (d[5] - d[7]) * c + d[7];
+    });
+
+    updateCanvas4();
+    
+    window.requestAnimFrame(step);
+  }
+
+  window.requestAnimFrame(step);
+}
+
 
 function createScene(imageData, data) {
   var limit = imageData.width * imageData.height * 4;
@@ -309,16 +418,7 @@ ready(function(){
   $('#canvas2').height = height;
   $('#canvas3').width = width;
   $('#canvas3').height = height;
-
-  window.requestAnimFrame = (function(){
-    return  window.requestAnimationFrame       ||
-          window.webkitRequestAnimationFrame ||
-          window.mozRequestAnimationFrame    ||
-          function( callback ){
-            window.setTimeout(callback, 1000 / 60);
-          };
-  })();
-
+ 
   $('#update').addEventListener('click', function(){
     n = +$('#n').value;
     update();
@@ -346,6 +446,12 @@ ready(function(){
     if(isPlaying)return;
     isPlaying = true;
     playCanvas3();
+  });
+
+  $('#play-canvas4').addEventListener('click', function(){
+    if(isPlaying)return;
+    isPlaying = true;
+    playCanvas4();
   });
 
   n = +$('#n').value;
