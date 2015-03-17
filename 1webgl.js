@@ -2,7 +2,6 @@ var Webgl = (function(){
   var width, 
       height, 
       r,
-      data,
       stage = new PIXI.Stage(0xFFFFFF),
       renderer,
       data = [],

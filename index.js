@@ -12,11 +12,9 @@ var n,
     height = 300,
     r = 3,
     svg = d3.select('#svg'),
-    canvas1 = new createjs.Stage('canvas1'),
     canvas2 = new createjs.Stage('canvas2'),
     canvas3 = $('#canvas3'),
 //    context = canvas3.getContext('2d'),
-    canvas1Data,
     canvas2Data,
     canvas3Data,
     isPlaying = false,
@@ -62,27 +60,6 @@ function update(){
   circles
     .exit()
       .remove();
-
-  canvas1.removeAllChildren();
-  canvas1Data = [];
-
-  for(var i = 0; i < n; ++i) {
-    var circle = new createjs.Shape();
-    var d = {
-      x: random(width),
-      y: random(height)
-    };
-
-    circle.graphics.beginFill(getRandomColor()).drawCircle(0, 0, r);
-    circle.x = d.x;
-    circle.y = d.y;
-
-    canvas1.addChild(circle);
-    d.circle = circle;
-    canvas1Data.push(d);
-  }
-
-  canvas1.update();
 
   canvas2.removeAllChildren();
   canvas2Data = [];
@@ -168,45 +145,6 @@ function playSVG(){
     .each('end', function(){
       isPlaying = false;
     });
-}
-
-var duration = 1000,
-    frame = 30;
-
-
-function playCanvas1(){
-  canvas1Data.forEach(function(d){
-    var destX = random(width),
-        destY = random(height);
-
-    d.destX = destX;
-    d.destY = destY;
-  });
-
-  var count = 0;
-
-  var timer = setInterval(function(){
-    count ++;
-    if(count > frame) {
-      clearInterval(timer); 
-      canvas1Data.forEach(function(d){
-        d.x = d.destX;
-        d.y = d.destY;
-      });
-      isPlaying = false;
-      return;
-    }
-    
-    var f = count / frame, 
-        c = cubic(f);
-
-    canvas1Data.forEach(function(d){
-      d.circle.x = (d.destX - d.x) * c + d.x;
-      d.circle.y = (d.destY - d.y) * c + d.y;
-    });
-
-    canvas1.update();
-  }, duration / frame);
 }
 
 function playCanvas2(){
@@ -301,15 +239,17 @@ var n,
     width = 700,
     height = 300,
     r = 3,
-    isPlaying = false
+    isPlaying = false,
+    duration = 1000,
+    frame = 30
     ;
 
 var methods = [
   Webgl/*,
   PixelData,
   Svg,
-  Canvas,
-  Baseline*/
+  Canvas,*/,
+  Baseline
 ];
 
 var colors = d3.scale.category10();
@@ -328,7 +268,6 @@ function cubic(t) {
   var t2 = t * t, t3 = t2 * t;
   return 4 * (t < .5 ? t3 : 3 * (t - t2) + t3 - .75);
 }
-
 
 ready(function(){
   methods.forEach(function(method, i) {
@@ -364,12 +303,4 @@ ready(function(){
   methods.forEach(function(method) {
     method.update(data);
   });
-
-  svg.attr('width', width).attr('height', height);
-  $('#canvas1').width = width;
-  $('#canvas1').height = height;
-  $('#canvas2').width = width;
-  $('#canvas2').height = height;
-  $('#canvas3').width = width;
-  $('#canvas3').height = height;
 });
