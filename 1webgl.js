@@ -6,6 +6,7 @@ var Webgl = (function(){
       renderer,
       data = [],
       sbs = {},
+      bsbs = {},
       colors,
       textures
       ;
@@ -47,12 +48,20 @@ var Webgl = (function(){
         var sb = new PIXI.SpriteBatch();
         sbs[color] = sb;
         stage.addChild(sb);
+
+        var bsb = new PIXI.SpriteBatch();
+        bsbs[color] = bsb;
+      });
+
+      colors.reverse().forEach(function(color) {
+        stage.addChild(bsbs[color]);
       });
       
       newData.forEach(function(d){
         var sp = new PIXI.Sprite(textures[d[2]]);
         data.push([d[0], d[1], sp]);
-        sbs[d[2]].addChild(sp);
+        
+        ((Math.random() > .2) ? sbs : bsbs)[d[2]].addChild(sp);
       });
 
       Webgl.draw();
