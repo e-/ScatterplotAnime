@@ -47,6 +47,7 @@ var PixelData = (function(){
     update: function(newData){ 
       var imageData = context.createImageData(width, height);
       
+      data = [];
       newData.forEach(function(d){
         var rgb = d3.rgb(d[2]);
         data.push([d[0], d[1], rgb.r, rgb.g, rgb.b]);
