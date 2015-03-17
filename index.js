@@ -8,7 +8,7 @@ function ready(fn) {
 
 var n,
     $ = document.querySelector.bind(document),
-    width = 800,
+    width = 700,
     height = 300,
     r = 3,
     svg = d3.select('#svg'),
@@ -419,9 +419,11 @@ ready(function(){
   $('#canvas3').width = width;
   $('#canvas3').height = height;
  
-  $('#update').addEventListener('click', function(){
+  $('form').addEventListener('submit', function(e){
     n = +$('#n').value;
     update();
+    e.preventDefault();
+    return false;
   });
  
   $('#play-svg').addEventListener('click', function(){

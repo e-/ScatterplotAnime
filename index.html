@@ -5,56 +5,89 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Scatterplot Animation</title>
-
-    <!-- Bootstrap -->
+    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
     <style>
+      body{
+        background:#eee;
+      }
+
       circle { 
         stroke:none;
       }
+      .container{ 
+        margin-top:20px;
+        width: 1600px;
+        background:#fff;
+        border:1px solid #ccc;
+        border-radius:20px;
+        padding-left:40px;
+        padding-right:40px;
+      }
+      h1{
+        font-size:5em;
+        margin:.5em auto;
+      }
+      .row{
+        margin-top:50px;
+      }
+      form{
+        font-size:1.5em;
+      }
     </style>
   </head>
-  <body class="container">
-    <h1>Scatterplot Example</h1>
-    <form class="form-inline">
-      <div class="form-group">
-        <label for="n">N</label>
-        <input type="number" value="100" id="n" min="1" class="form-control">
+  <body>
+    <div class="container">
+      <h1>Scatterplot Animation</h1>
+      <form class="form-inline">
+        <div class="form-group">
+          <label for="n">Number of points: </label>
+          <input type="number" value="100" id="n" min="1" class="form-control">
+        </div>
+        <button id="update" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Update</button>
+      </form>
+      <div class="row">
+        <div class="col-xs-6"> 
+          <h2>1. WebGL (pixi.js)
+            <button class="btn btn-default" id="play-canvas4"><span class="glyphicon glyphicon-play"></span> Play</button>
+          </h2>
+          <canvas id="canvas4"></canvas>
+        </div>
+        <div class="col-xs-6">
+          <h2>2. By Manipulating Pixel Data
+          <button class="btn btn-default" id="play-canvas3"><span class="glyphicon glyphicon-play"></span> Play</button>
+          </h2>
+          <canvas id="canvas3"></canvas>
+        </div>
       </div>
-    </form>
-    <button id="update" class="btn btn-default">update</button>
-
-    <h2>using WebGL (pixi.js)</h2>
-    <canvas id="canvas4"></canvas>
-    <button class="btn btn-default" id="play-canvas4"><span class="glyphicon glyphicon-play"></span></button>
-
-    <h2>using imageData</h2>
-    <canvas id="canvas3"></canvas>
-    <button class="btn btn-default" id="play-canvas3"><span class="glyphicon glyphicon-play"></span></button>
-
-    <h2>using SVG (d3.js)</h2>
-    <svg id="svg"></svg>
-    <button class="btn btn-default" id="play-svg"><span class="glyphicon glyphicon-play"></span></button>
-
-    <h2>using Canvas (easel.js)</h2>
-    <canvas id="canvas1"></canvas>
-    <button class="btn btn-default" id="play-canvas1"><span class="glyphicon glyphicon-play"></span></button>
-
-    <h2>using Canvas with requestAnimationFrame (easel.js)</h2>
-    <canvas id="canvas2"></canvas>
-    <button class="btn btn-default" id="play-canvas2"><span class="glyphicon glyphicon-play"></span></button>
-
-
+      <div class="row">
+        <div class="col-xs-6"> 
+          <h2>3. SVG (d3.js)
+            <button class="btn btn-default" id="play-svg"><span class="glyphicon glyphicon-play"></span> Play</button>
+          </h2>
+          <svg id="svg"></svg>
+        </div>
+        <div class="col-xs-6"> 
+          <h2>4. Canvas with requestAnimationFrame (easel.js)
+            <button class="btn btn-default" id="play-canvas2"><span class="glyphicon glyphicon-play"></span> Play</button>
+          </h2>
+          <canvas id="canvas2"></canvas>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-6"> 
+          <h2>5. Canvas (easel.js)
+            <button class="btn btn-default" id="play-canvas1"><span class="glyphicon glyphicon-play"></span> Play</button>
+          </h2>
+          <canvas id="canvas1"></canvas>
+        </div>
+      </div>  
+    </div>
 
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="https://code.createjs.com/easeljs-0.8.0.min.js"></script>
     <script src="pixi.js"></script>
     <script src="index.js"></script>
+
   </body>
 </html>
