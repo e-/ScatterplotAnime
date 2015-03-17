@@ -247,9 +247,9 @@ var n,
 var methods = [
   Webgl/*,
   PixelData,
-  Svg,
-  Canvas,*/,
-  Baseline
+  Svg*/,
+  Canvas/*,
+  Baseline*/
 ];
 
 var colors = d3.scale.category10();
