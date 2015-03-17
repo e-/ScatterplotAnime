@@ -30,9 +30,6 @@ var n,
   
   
 
-function translate(x, y){
-  return 'translate(' + x + ',' + y + ')';
-}
 
 function update(){
   var data = d3.range(n).map(function(){
@@ -245,9 +242,10 @@ var n,
     ;
 
 var methods = [
-  Webgl/*,
-  PixelData,
-  Svg*/,
+  Webgl,
+  Baseline,/*,
+  PixelData,*/
+  Svg,
   Canvas/*,
   Baseline*/
 ];
