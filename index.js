@@ -15,12 +15,10 @@ var n,
     canvas1 = new createjs.Stage('canvas1'),
     canvas2 = new createjs.Stage('canvas2'),
     canvas3 = $('#canvas3'),
-    context = canvas3.getContext('2d'),
-    colors = d3.scale.category10(),
+//    context = canvas3.getContext('2d'),
     canvas1Data,
     canvas2Data,
     canvas3Data,
-    canvas4Data,
     isPlaying = false,
     graphics = new PIXI.Graphics(),
     stage = new PIXI.Stage(0xFFFFFF),
@@ -33,13 +31,6 @@ var n,
   ;
   
   
-function getRandomColor(){
-  return colors(Math.floor(Math.random() * 10));
-}
-
-function random(x) {
-  return Math.random() * x;
-}
 
 function translate(x, y){
   return 'translate(' + x + ',' + y + ')';
@@ -131,106 +122,7 @@ function update(){
   var imageData = context.createImageData(width, height);
   createScene(imageData, canvas3Data);
   context.putImageData(imageData, 0, 0);
-
-  canvas4Data = [];
-  
-  stage.removeChildren();
-
-  spriteBatches = {};
-  
-  colors.range().forEach(function(color) {
-    var sp = new PIXI.SpriteBatch();
-    spriteBatches[color] = sp;
-    stage.addChild(sp);
-  });
-  
-  textures = (function(){
-/*    var g = new PIXI.Graphics();
-    g.beginFill(0x888888);//FFFFFFF);
-    g.drawCircle(r, r, r);
-    g.endFill();
-
-    return g.generateTexture();*/
-
-    var t = {};
-    colors.range().forEach(function(code) {
-      var g = new PIXI.Graphics();
-      g.beginFill(hexToWebgl(code));
-      g.drawCircle(r, r, r);
-      g.endFill();
-      t[code] = g.generateTexture();
-    });
-    return t; 
-  })();
-
-  for(var i = 0 ; i < n ; ++i) {
-    var color = getRandomColor();
-    var sp = new PIXI.Sprite(textures[color]); //textures); //[getRandomColor()]);
-    canvas4Data.push([random(width), random(height), 1, sp]);
-    spriteBatches[color].addChild(sp);
-//    stage.addChild(sp);
-//    sp.tint = hexToWebgl(getRandomColor()); 
-  }
-  
-  updateCanvas4();
 }
-
-function hexToWebgl(hex) {
-  return parseInt(hex.substr(1), 16);
-}
-
-function updateCanvas4()
-{
-  canvas4Data.forEach(function(d){
-    d[3].x = d[0] - r;
-    d[3].y = d[1] - r;
-  });
-
-  renderer.render(stage);
-}
-
-function playCanvas4(){
-  canvas4Data.forEach(function(d){
-    var destX = random(width),
-        destY = random(height);
-
-    d[4] = destX;
-    d[5] = destY;
-    d[6] = d[0];
-    d[7] = d[1];
-  });
-
-  var count = 0, start = null;
-
-  function step(timestamp) {
-    if(!start) start = timestamp;
-    var progress = (timestamp - start) / duration;
-    if(progress > 1) {
-      canvas4Data.forEach(function(d){
-        d[0] = d[4];
-        d[1] = d[5];
-      });
-      
-      updateCanvas4();
-      isPlaying = false;
-      return;
-    }
-
-    var c = cubic(progress);
-    
-    canvas4Data.forEach(function(d){
-      d[0] = (d[4] - d[6]) * c + d[6];
-      d[1] = (d[5] - d[7]) * c + d[7];
-    });
-
-    updateCanvas4();
-    
-    window.requestAnimFrame(step);
-  }
-
-  window.requestAnimFrame(step);
-}
-
 
 function createScene(imageData, data) {
   var limit = imageData.width * imageData.height * 4;
@@ -281,12 +173,6 @@ function playSVG(){
 var duration = 1000,
     frame = 30;
 
-function cubic(t) {
-  if (t <= 0) return 0;
-  if (t >= 1) return 1;
-  var t2 = t * t, t3 = t2 * t;
-  return 4 * (t < .5 ? t3 : 3 * (t - t2) + t3 - .75);
-}
 
 function playCanvas1(){
   canvas1Data.forEach(function(d){
@@ -410,7 +296,75 @@ function playCanvas3(){
 }
 
 
+var n,
+    $ = document.querySelector.bind(document),
+    width = 700,
+    height = 300,
+    r = 3,
+    isPlaying = false
+    ;
+
+var methods = [
+  Webgl/*,
+  PixelData,
+  Svg,
+  Canvas,
+  Baseline*/
+];
+
+var colors = d3.scale.category10();
+
+function getRandomColor(){
+  return colors(Math.floor(Math.random() * 10));
+}
+
+function random(x) {
+  return Math.random() * x;
+}
+
+function cubic(t) {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  var t2 = t * t, t3 = t2 * t;
+  return 4 * (t < .5 ? t3 : 3 * (t - t2) + t3 - .75);
+}
+
+
 ready(function(){
+  methods.forEach(function(method, i) {
+    i++;
+    method.initialize($('#canvas' + i), width, height, r, colors.range());
+    $('#play' + i).addEventListener('click', function(){
+      if(isPlaying) return;
+      isPlaying = true;
+      method.play(function() {
+        isPlaying = false;
+      });
+    });
+  });
+ 
+  $('form').addEventListener('submit', function(e){
+    n = +$('#n').value;
+    
+    var data = d3.range(n).map(function() {
+      return [random(width), random(height), getRandomColor()];
+    });
+    methods.forEach(function(method) {
+      method.update(data);
+    });
+
+    e.preventDefault();
+    return false;
+  });
+
+  n = +$('#n').value;
+  var data = d3.range(n).map(function() {
+    return [random(width), random(height), getRandomColor()];
+  });
+  methods.forEach(function(method) {
+    method.update(data);
+  });
+
   svg.attr('width', width).attr('height', height);
   $('#canvas1').width = width;
   $('#canvas1').height = height;
@@ -418,44 +372,4 @@ ready(function(){
   $('#canvas2').height = height;
   $('#canvas3').width = width;
   $('#canvas3').height = height;
- 
-  $('form').addEventListener('submit', function(e){
-    n = +$('#n').value;
-    update();
-    e.preventDefault();
-    return false;
-  });
- 
-  $('#play-svg').addEventListener('click', function(){
-    if(isPlaying)return;
-    isPlaying = true;
-    playSVG();
-  });
-
-  $('#play-canvas1').addEventListener('click', function(){
-    if(isPlaying)return;
-    isPlaying = true;
-    playCanvas1();
-  });
-
-  $('#play-canvas2').addEventListener('click', function(){
-    if(isPlaying)return;
-    isPlaying = true;
-    playCanvas2();
-  });
-
-  $('#play-canvas3').addEventListener('click', function(){
-    if(isPlaying)return;
-    isPlaying = true;
-    playCanvas3();
-  });
-
-  $('#play-canvas4').addEventListener('click', function(){
-    if(isPlaying)return;
-    isPlaying = true;
-    playCanvas4();
-  });
-
-  n = +$('#n').value;
-  update();
 });
